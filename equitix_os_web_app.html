@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equitix OS | Compensation Intelligence Platform</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#1d58ff', 600: '#1541db', 900: '#0c4a6e' },
+                        slate: { 850: '#151e2e' }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(29, 88, 255, 0.5)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* AI Typing Animation */
+        .typewriter-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: #1d58ff;
+            animation: blink 1s step-end infinite;
+            vertical-align: bottom;
+            margin-left: 2px;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .view-section { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .view-section.active { display: block; opacity: 1; }
+        
+        .nav-item.active { background-color: rgba(29, 88, 255, 0.15); color: #3b82f6; border-color: rgba(29, 88, 255, 0.3); }
+
+        /* Print Styles for PDF Export */
+        @media print {
+            aside, .no-print, .global-header { display: none !important; }
+            main { margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; }
+            .view-section.active { display: block !important; opacity: 1 !important; page-break-inside: avoid; }
+            body { background-color: white; }
+            .glass-panel { border: 1px solid #e2e8f0; backdrop-filter: none; }
+            .shadow-soft { box-shadow: none; border: 1px solid #e2e8f0; }
+            .overflow-y-auto { overflow: visible !important; max-height: none !important; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased h-screen flex overflow-hidden">
+
+    <aside class="w-64 bg-slate-900 text-white flex flex-col transition-all duration-300 relative z-20 shadow-2xl">
+        <div class="p-6 flex items-center justify-between border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-600 flex items-center justify-center shadow-glow">
+                    <i class="fa-solid fa-layer-group text-white text-sm"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight">Equitix OS</span>
+            </div>
+        </div>
+        
+        <nav class="flex-1 py-6 px-4 space-y-2">
+            <p class="px-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Modules</p>
+            <button onclick="switchView('ta-offers')" id="nav-ta-offers" class="nav-item active w-full flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-slate-200 rounded-xl transition-colors border border-transparent text-left">
+                <i class="fa-solid fa-handshake w-5 text-center"></i>
+                <span class="font-medium text-sm">TA Offer Analytics</span>
+            </button>
+            <button onclick="switchView('retention')" id="nav-retention" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-slate-200 rounded-xl transition-colors border border-transparent text-left">
+                <i class="fa-solid fa-chart-line w-5 text-center"></i>
+                <span class="font-medium text-sm">Compa-Ratio Core</span>
+            </button>
+            <button onclick="switchView('equity')" id="nav-equity" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-slate-200 rounded-xl transition-colors border border-transparent text-left">
+                <i class="fa-solid fa-scale-balanced w-5 text-center"></i>
+                <span class="font-medium text-sm">Pay Equity Audit</span>
+            </button>
+            <button onclick="switchView('canada')" id="nav-canada" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-slate-200 rounded-xl transition-colors border border-transparent text-left">
+                <i class="fa-solid fa-bridge w-5 text-center"></i>
+                <span class="font-medium text-sm">CA Market Bridge</span>
+            </button>
+        </nav>
+        
+        <div class="p-4 border-t border-slate-800 space-y-3">
+            <button onclick="toggleSettings()" class="w-full flex items-center gap-3 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-slate-200 rounded-xl transition-colors text-left text-sm">
+                <i class="fa-solid fa-gear w-5 text-center"></i> Integration Settings
+            </button>
+            <div class="flex items-center gap-3 px-3">
+                <img src="https://ui-avatars.com/api/?name=Total+Rewards&background=1d58ff&color=fff" alt="User" class="w-9 h-9 rounded-full border border-slate-700">
+                <div>
+                    <p class="text-sm font-medium">Total Rewards Team</p>
+                    <p class="text-xs text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-circle text-[8px]"></i> Admin Active</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative bg-slate-50/50">
+        
+        <!-- Global Header -->
+        <header class="global-header bg-white border-b border-slate-200 shadow-sm flex items-center justify-between px-6 py-3 z-20">
+            <div class="flex items-center gap-3 text-sm font-semibold text-slate-700">
+                <span>Equitix OS</span>
+                <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                <span class="text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100 flex items-center gap-1.5"><i class="fa-solid fa-bolt text-xs"></i> Live Demo</span>
+                <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                <span class="text-slate-500">Powered by Claude API</span>
+            </div>
+            <div class="text-xs font-medium text-slate-400 bg-slate-100 px-3 py-1.5 rounded-md flex items-center gap-2">
+                <i class="fa-regular fa-clock"></i>
+                <span class="data-timestamp">Loading time...</span>
+            </div>
+        </header>
+
+        <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-brand-50/50 to-transparent -z-10 no-print"></div>
+
+        <div class="flex-1 overflow-y-auto z-10 p-8 relative" id="main-scroll-area">
+            
+            <div class="flex justify-end mb-4 no-print sticky top-0 z-30">
+                <button onclick="exportToPDF()" class="bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-lg text-sm text-slate-600 hover:text-brand-600 hover:border-brand-300 font-medium flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-file-pdf text-rose-500"></i> Export to PDF
+                </button>
+            </div>
+
+            <!-- PDF Toast Notification -->
+            <div id="pdf-toast" class="hidden fixed top-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium z-50 flex items-center gap-3 animate-pulse">
+                <i class="fa-solid fa-spinner fa-spin text-brand-400"></i> Preparing PDF export...
+            </div>
+
+            <!-- VIEW: TA OFFERS -->
+            <div id="view-ta-offers" class="view-section active">
+                <header class="flex justify-between items-end mb-8">
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <h1 class="text-2xl font-bold text-slate-800">TA Compensation Rejection Analytics</h1>
+                        </div>
+                        <p class="text-sm text-slate-500">Isolating Offer Outcomes vs. Market Midpoint Inflections</p>
+                    </div>
+                    <button onclick="generateAI('ta')" class="no-print px-5 py-2.5 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-lg text-sm font-semibold shadow-md shadow-brand-500/30 hover:shadow-lg transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Offer Strategy Memo
+                    </button>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-rose-50 rounded-2xl p-5 shadow-soft border border-rose-100 relative overflow-hidden transition-all duration-300" id="ta-card-decline">
+                        <div class="absolute right-0 top-0 w-16 h-16 bg-rose-100 rounded-bl-full -z-0"></div>
+                        <p class="text-sm font-semibold text-rose-700 mb-2 relative z-10" id="ta-kpi-title-decline">Backend L4 Decline Rate (< 0.95 CR)</p>
+                        <h3 class="text-3xl font-bold text-rose-900 relative z-10" id="ta-kpi-decline">67.4%</h3>
+                        <p class="text-xs text-rose-600 mt-2 relative z-10"><i class="fa-solid fa-arrow-trend-up"></i> Critical Inflection Point</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 transition-all duration-300">
+                        <p class="text-sm font-medium text-slate-500 mb-2" id="ta-kpi-title-lost">Lost Candidates (Backend L4)</p>
+                        <h3 class="text-3xl font-bold text-slate-800" id="ta-kpi-lost">--</h3>
+                        <p class="text-xs text-slate-400 mt-2">Vetted pipeline leakage</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 transition-all duration-300">
+                        <p class="text-sm font-medium text-slate-500 mb-2">Avg. Competing Offer Gap</p>
+                        <h3 class="text-3xl font-bold text-slate-800" id="ta-kpi-gap">--</h3>
+                        <p class="text-xs text-slate-400 mt-2">Deficit vs. winning competitor</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 mb-8 relative" title="Compa-Ratio = Your Salary ÷ Market Midpoint. 1.0 = exactly at market.">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-slate-800">Acceptance vs. Decline Rates by Offer Compa-Ratio Bracket</h2>
+                        <span class="text-xs text-slate-400"><i class="fa-regular fa-circle-question"></i> Hover for Compa-Ratio Info</span>
+                    </div>
+                    <div id="plot-ta-bar" class="w-full min-h-[350px]"></div>
+                </div>
+
+                <!-- Filterable Data Table for TA Offers -->
+                <div class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden mb-8">
+                    <div class="p-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                        <h2 class="text-lg font-semibold text-slate-800">Raw Offers Log</h2>
+                        <div class="flex gap-2" id="ta-filter-buttons">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    <div class="max-h-[300px] overflow-y-auto w-full no-print-scroll">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="text-xs text-slate-500 uppercase bg-white sticky top-0 shadow-sm z-10">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold">Role</th>
+                                    <th class="px-6 py-3 font-semibold">Level</th>
+                                    <th class="px-6 py-3 font-semibold">Compa-Ratio</th>
+                                    <th class="px-6 py-3 font-semibold">Offered Salary</th>
+                                    <th class="px-6 py-3 font-semibold">Outcome</th>
+                                    <th class="px-6 py-3 font-semibold">Competing Est.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ta-table-body" class="divide-y divide-slate-100">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: RETENTION -->
+            <div id="view-retention" class="view-section">
+                <header class="flex justify-between items-end mb-8">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">Mid-Year Merit & Retention Planner</h1>
+                        <p class="text-sm text-slate-500 mt-1">Live Budget Modeling • Simulating N=250 Workforce Payload</p>
+                    </div>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 transition-all duration-300" id="card-ret-payroll">
+                        <div class="flex justify-between items-start mb-4">
+                            <p class="text-sm font-medium text-slate-500">Total Payroll</p>
+                            <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-sack-dollar"></i></div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800" id="ret-kpi-payroll">--</h3>
+                        <p class="text-xs text-brand-600 mt-2 font-medium hidden" id="ret-kpi-payroll-diff"></p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 transition-all duration-300" id="card-ret-compa">
+                        <div class="flex justify-between items-start mb-4">
+                            <p class="text-sm font-medium text-slate-500">Avg Compa-Ratio</p>
+                            <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-chart-pie"></i></div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800" id="ret-kpi-compa">--</h3>
+                        <p class="text-xs text-emerald-600 mt-2 font-medium hidden" id="ret-kpi-compa-diff"></p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 transition-all duration-300" id="card-ret-risk">
+                        <div class="flex justify-between items-start mb-4">
+                            <p class="text-sm font-medium text-slate-500">Critical Flight Risks</p>
+                            <div class="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800" id="ret-kpi-risk">--</h3>
+                        <p class="text-xs text-slate-400 mt-2" id="ret-kpi-risk-label">Underpaid High-Performers</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 transition-all duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <p class="text-sm font-medium text-slate-500">Overpay Outliers</p>
+                            <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800" id="ret-kpi-overpay">--</h3>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-soft border border-slate-100 p-6 relative" title="Compa-Ratio = Your Salary ÷ Market Midpoint. 1.0 = exactly at market.">
+                        <h2 class="text-lg font-semibold text-slate-800 mb-4">Compa-Ratio Distribution by Department</h2>
+                        <div id="plot-retention-box" class="w-full min-h-[300px]"></div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 flex flex-col no-print border-l-4 border-l-brand-500">
+                        <h2 class="text-lg font-semibold text-slate-800 mb-1">Live Budget Simulator</h2>
+                        <p class="text-xs text-slate-500 mb-6">Allocate pool to close gaps. Watch KPIs update dynamically.</p>
+                        
+                        <div class="mb-6">
+                            <div class="flex justify-between text-sm mb-2">
+                                <label class="font-medium text-slate-700">Merit Pool Allocation</label>
+                                <span id="budget-val-display" class="font-bold text-brand-600 bg-brand-50 px-2 rounded border border-brand-100">0.0%</span>
+                            </div>
+                            <input type="range" id="budget-slider" min="0.0" max="6.0" step="0.1" value="0.0" 
+                                class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                        </div>
+
+                        <div class="space-y-4 flex-1">
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 flex justify-between items-center transition-all" id="pool-container">
+                                <div><p class="text-xs text-slate-500 font-medium">Available Budget Pool</p><p id="pool-display" class="text-xl font-bold text-slate-800">$0</p></div>
+                                <i class="fa-solid fa-vault text-slate-300 text-2xl"></i>
+                            </div>
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 flex justify-between items-center">
+                                <div><p class="text-xs text-slate-500 font-medium">Cost to Fix Underpaid (< 1.0 CR)</p><p id="cost-display" class="text-xl font-bold text-slate-800">$0</p></div>
+                                <i class="fa-solid fa-wrench text-slate-300 text-2xl"></i>
+                            </div>
+                        </div>
+                        <div id="budget-status" class="mt-4 p-3 rounded-lg text-center text-sm font-semibold transition-colors"></div>
+                    </div>
+                </div>
+
+                <!-- Filterable Employee Table -->
+                <div class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden mb-8">
+                    <div class="p-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                        <h2 class="text-lg font-semibold text-slate-800">Employee Details (Post-Simulation)</h2>
+                        <select id="retention-dept-filter" onchange="renderRetentionTable()" class="text-sm bg-white border border-slate-200 rounded-lg px-3 py-1.5 outline-none font-medium text-slate-700 shadow-sm cursor-pointer">
+                            <option value="All">All Departments</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Product">Product</option>
+                            <option value="Field Ops">Field Ops</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Finance">Finance</option>
+                        </select>
+                    </div>
+                    <div class="max-h-[300px] overflow-y-auto w-full no-print-scroll">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="text-xs text-slate-500 uppercase bg-white sticky top-0 shadow-sm z-10">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold">Emp ID</th>
+                                    <th class="px-6 py-3 font-semibold">Dept</th>
+                                    <th class="px-6 py-3 font-semibold">Level</th>
+                                    <th class="px-6 py-3 font-semibold">Sim. Salary</th>
+                                    <th class="px-6 py-3 font-semibold">Midpoint</th>
+                                    <th class="px-6 py-3 font-semibold">Sim. Compa</th>
+                                    <th class="px-6 py-3 font-semibold">Risk Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="retention-table-body" class="divide-y divide-slate-100">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: EQUITY -->
+            <div id="view-equity" class="view-section">
+                <header class="flex justify-between items-end mb-8">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">Pay Equity & Demographic Audit</h1>
+                        <p class="text-sm text-slate-500 mt-1">Unadjusted vs. Adjusted Gap Analysis across Cohorts</p>
+                    </div>
+                    <button onclick="generateAI('equity')" class="no-print px-5 py-2.5 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-lg text-sm font-semibold shadow-md shadow-brand-500/30 hover:shadow-lg transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Compliance Brief
+                    </button>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500 mb-1">Unadjusted Pay Gap (Female to Male)</p>
+                            <h3 class="text-2xl font-bold text-slate-800">92.4¢</h3>
+                            <p class="text-xs text-slate-400 mt-1">Raw average comparison across all roles</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center text-xl"><i class="fa-solid fa-scale-unbalanced"></i></div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500 mb-1">Adjusted Pay Gap (Same Role/Level)</p>
+                            <h3 class="text-2xl font-bold text-brand-600">99.1¢</h3>
+                            <p class="text-xs text-slate-400 mt-1">Statistically normalized compliance metric</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-brand-50 text-brand-500 flex items-center justify-center text-xl"><i class="fa-solid fa-scale-balanced"></i></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 relative" title="Compa-Ratio = Your Salary ÷ Market Midpoint. 1.0 = exactly at market.">
+                        <h2 class="text-lg font-semibold text-slate-800 mb-4">Compa-Ratio Distribution by Gender</h2>
+                        <div id="plot-equity-scatter" class="w-full min-h-[350px]"></div>
+                    </div>
+                    
+                    <!-- Pay Equity Breakdown Table -->
+                    <div class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden flex flex-col">
+                        <div class="p-5 border-b border-slate-100 bg-slate-50">
+                            <h2 class="text-lg font-semibold text-slate-800">Cohort Gap Breakdown</h2>
+                            <p class="text-xs text-slate-500 mt-1">Comparing Average Compa-Ratio to Male Baseline per Dept</p>
+                        </div>
+                        <div class="flex-1 overflow-y-auto no-print-scroll p-0">
+                            <table class="w-full text-left text-sm text-slate-600">
+                                <thead class="text-xs text-slate-500 uppercase bg-white sticky top-0 shadow-sm z-10">
+                                    <tr>
+                                        <th class="px-5 py-3 font-semibold">Department</th>
+                                        <th class="px-5 py-3 font-semibold">Gender</th>
+                                        <th class="px-5 py-3 font-semibold">Avg Compa</th>
+                                        <th class="px-5 py-3 font-semibold text-right">Gap vs Male</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="equity-table-body" class="divide-y divide-slate-100">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: CANADA MARKET BRIDGE -->
+            <div id="view-canada" class="view-section">
+                <header class="flex justify-between items-end mb-8">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">US → Canada Compensation Bridge</h1>
+                        <p class="text-sm text-slate-500 mt-1">Toronto Market Normalization · USD to CAD Conversion · Statutory Benefits Adjustment</p>
+                    </div>
+                    <button onclick="generateAI('canada')" class="no-print px-5 py-2.5 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-lg text-sm font-semibold shadow-md shadow-brand-500/30 hover:shadow-lg transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Cross-Border Offer Strategy
+                    </button>
+                </header>
+
+                <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 mb-6 flex items-center gap-4">
+                    <label for="role-select" class="text-sm font-medium text-slate-700">Select Role to Benchmark:</label>
+                    <select id="role-select" onchange="renderCanada()" class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-brand-500 min-w-[250px] cursor-pointer">
+                        <option value="Backend Engineer L4">Backend Engineer L4</option>
+                        <option value="Product Manager L5">Product Manager L5</option>
+                        <option value="Data Scientist L4">Data Scientist L4</option>
+                        <option value="Field Operations Specialist L3">Field Operations Specialist L3</option>
+                        <option value="Finance Analyst L4">Finance Analyst L4</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100">
+                        <p class="text-sm font-medium text-slate-500 mb-2">US Base (USD)</p>
+                        <h3 class="text-2xl font-bold text-slate-800" id="canada-kpi-us">--</h3>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100">
+                        <p class="text-sm font-medium text-slate-500 mb-2">Raw CAD Conversion</p>
+                        <h3 class="text-2xl font-bold text-slate-800" id="canada-kpi-raw">--</h3>
+                        <p class="text-xs text-slate-400 mt-2">At 1.36 exchange rate</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100">
+                        <p class="text-sm font-medium text-slate-500 mb-2">Toronto Market Rate</p>
+                        <h3 class="text-2xl font-bold text-rose-600" id="canada-kpi-market">--</h3>
+                        <p class="text-xs text-rose-400 mt-2">Actual competitive rate</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100">
+                        <p class="text-sm font-medium text-slate-500 mb-2">Benefits Adjustment</p>
+                        <h3 class="text-2xl font-bold text-emerald-600" id="canada-kpi-benefits">--</h3>
+                        <p class="text-xs text-slate-400 mt-2">CPP & EI delta</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 mb-8 relative" title="Comparing Raw Conversion to Actual Local Market Value">
+                    <h2 class="text-lg font-semibold text-slate-800 mb-4">Why Raw FX Conversion Underprices Toronto Talent</h2>
+                    <div id="plot-canada-bar" class="w-full min-h-[350px]"></div>
+                </div>
+            </div>
+
+            <div id="ai-panel" class="hidden glass-panel rounded-2xl shadow-lg border border-brand-200 p-6 relative overflow-hidden mb-12">
+                <div class="absolute top-0 right-0 w-1 bg-gradient-to-b from-brand-400 to-blue-600 h-full"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-robot text-brand-500"></i> AI Executive Synthesis
+                    </h2>
+                    <button onclick="document.getElementById('ai-panel').classList.add('hidden')" class="no-print text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="ai-content" class="text-sm text-slate-700 leading-relaxed font-medium"></div>
+            </div>
+
+            <!-- Footer Section -->
+            <footer class="mt-16 pb-4 text-center text-xs text-slate-400 font-medium no-print w-full">
+                Built by Adeeb Khan · Compensation Intelligence Platform · Powered by Claude API
+            </footer>
+
+        </div>
+    </main>
+
+    <div id="settings-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center no-print">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-200" id="modal-content">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-shield-halved text-brand-500 mr-2"></i> Integration Settings</h3>
+                <button onclick="toggleSettings()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Anthropic API Key (Claude 4.6)</label>
+                    <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm">
+                    <div class="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg text-xs text-blue-800 leading-relaxed">
+                        <strong>Portfolio Demo Mode</strong> — in production, this connects to the <code>llm_service.py</code> backend via a secured API proxy. The Python backend handles all Anthropic API calls server-side, keeping keys out of the browser entirely.
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                <button onclick="toggleSettings()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const formatMoney = (num) => '$' + num.toLocaleString('en-US', {maximumFractionDigits: 0});
+        const formatPct = (num) => (num * 100).toFixed(1) + '%';
+        
+        // Update Data Timestamp globally
+        function updateTimestamps() {
+            const now = new Date().toLocaleString();
+            document.querySelectorAll('.data-timestamp').forEach(el => el.innerText = 'Data as of: ' + now);
+        }
+        updateTimestamps();
+
+        // PDF Export Toast logic
+        function exportToPDF() {
+            const toast = document.getElementById('pdf-toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                window.print();
+            }, 1000);
+        }
+        
+        // --- 1. SIMULATED DATA GENERATION ---
+        
+        const depts = ['Engineering', 'Product', 'Field Ops', 'Sales', 'Finance'];
+        const levels = ['L3', 'L4', 'L5', 'L6'];
+        const genders = ['Male', 'Female']; // Simplified for gap math visualization
+        
+        const employees = [];
+        let totalPayrollBaseline = 0;
+        let costToMidpointBaseline = 0;
+        
+        let seed = 1;
+        function random() {
+            let x = Math.sin(seed++) * 10000;
+            return x - Math.floor(x);
+        }
+
+        for(let i=1; i<=250; i++) {
+            const dept = depts[Math.floor(random() * depts.length)];
+            const level = levels[Math.floor(random() * levels.length)];
+            const gender = genders[Math.floor(random() * genders.length)];
+            const perf = Math.floor(random() * 5) + 1; // 1-5 rating
+            
+            const baseMap = {'L3': 90000, 'L4': 130000, 'L5': 175000, 'L6': 220000};
+            const deptMult = {'Engineering': 1.25, 'Product': 1.15, 'Field Ops': 0.85, 'Sales': 1.0, 'Finance': 0.95};
+            const midpoint = Math.floor(baseMap[level] * deptMult[dept]);
+            
+            // Base compa normally distributed around 0.96
+            let u = 0, v = 0;
+            while(u === 0) u = random();
+            while(v === 0) v = random();
+            let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+            let compa = (num / 10.0) + 0.96; 
+            
+            // Introduce subtle structural gaps for equity/risk narratives
+            if(gender === 'Female') compa *= (0.97 + (random() * 0.02)); 
+            if(perf >= 4 && random() > 0.5) compa *= 0.92; // Create underpaid high performers intentionally
+            
+            const salary = Math.floor(midpoint * compa);
+            compa = salary / midpoint;
+            
+            let risk = "Balanced";
+            if (compa < 0.90 && perf >= 4) risk = "Critical Risk"; 
+            if (compa > 1.15) risk = "Overpaid";
+
+            totalPayrollBaseline += salary;
+            if (compa < 1.0) costToMidpointBaseline += (midpoint - salary);
+
+            employees.push({ id: `E-${i.toString().padStart(3, '0')}`, dept, level, gender, perf, midpoint, salary, compa, risk });
+        }
+
+        const offers = [];
+        let lostCandidatesTotal = 0;
+        let totalGapDollars = 0;
+
+        for(let i=0; i<300; i++) {
+            const role = random() < 0.4 ? 'Backend Engineer' : 'Other Roles';
+            const level = random() < 0.5 ? 'L4' : 'L3';
+            const midpoint = 145000;
+            
+            const compa = parseFloat((0.82 + (random() * 0.33)).toFixed(2));
+            const offered = Math.floor(midpoint * compa);
+            
+            let outcome = 'Accepted';
+            if (role === 'Backend Engineer' && level === 'L4' && compa < 0.95) {
+                outcome = random() < 0.67 ? 'Declined' : 'Accepted';
+            } else if (compa < 0.90) {
+                outcome = random() < 0.5 ? 'Declined' : 'Accepted';
+            } else if (compa >= 1.0) {
+                outcome = random() < 0.15 ? 'Declined' : 'Accepted';
+            } else {
+                outcome = random() < 0.4 ? 'Declined' : 'Accepted';
+            }
+
+            const competing_offer = outcome === 'Declined' ? Math.floor(offered * (1.05 + random()*0.07)) : null;
+            
+            if(role === 'Backend Engineer' && level === 'L4' && compa < 0.95 && outcome === 'Declined') {
+                lostCandidatesTotal++;
+                totalGapDollars += (competing_offer - offered);
+            }
+
+            let bucket = ">1.05";
+            if (compa < 0.85) bucket = "<0.85";
+            else if (compa < 0.90) bucket = "0.85-0.90";
+            else if (compa < 0.95) bucket = "0.90-0.95";
+            else if (compa <= 1.05) bucket = "0.95-1.05";
+
+            offers.push({ role, level, compa, bucket, outcome, offered, competing_offer });
+        }
+
+        // --- STREAMING_CHUNK: Retention & Merit Simulation Logic ---
+        
+        let currentSimulatedEmployees = [...employees];
+        let currentDeptFilter = 'All';
+
+        function getCRColorClass(cr) {
+            if(cr < 0.88) return 'text-rose-600 font-semibold bg-rose-50 px-2 py-0.5 rounded';
+            if(cr < 0.95) return 'text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded';
+            if(cr <= 1.10) return 'text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded';
+            return 'text-orange-600 font-semibold bg-orange-50 px-2 py-0.5 rounded';
+        }
+
+        function simulateRaises(pct) {
+            const pool = totalPayrollBaseline * (pct / 100);
+            let simulated = employees.map(e => ({...e})); // deep copy
+            let underpaid = simulated.filter(e => e.compa < 1.0);
+            let totalDeficit = underpaid.reduce((sum, e) => sum + (e.midpoint - e.salary), 0);
+
+            if (pool > 0 && totalDeficit > 0) {
+                // If pool exists, distribute proportionally to those under midpoint
+                let allocationRatio = Math.min(pool / totalDeficit, 1.0);
+                underpaid.forEach(e => {
+                    let raise = (e.midpoint - e.salary) * allocationRatio;
+                    e.salary += raise;
+                    e.compa = e.salary / e.midpoint;
+                    // Dynamically recalculate risk based on simulated compa
+                    if (e.compa >= 0.90 && e.risk === 'Critical Risk') e.risk = 'Balanced (Resolved)';
+                });
+            }
+            return { simulated, pool, totalDeficit };
+        }
+
+        function renderRetentionTable() {
+            const tbody = document.getElementById('retention-table-body');
+            let filtered = currentSimulatedEmployees;
+            if (currentDeptFilter !== 'All') {
+                filtered = filtered.filter(e => e.dept === currentDeptFilter);
+            }
+            
+            // Sort to show Critical Risks and lowest Compa first
+            filtered.sort((a, b) => {
+                if (a.risk.includes('Critical') && !b.risk.includes('Critical')) return -1;
+                if (!a.risk.includes('Critical') && b.risk.includes('Critical')) return 1;
+                return a.compa - b.compa;
+            });
+
+            tbody.innerHTML = filtered.map(e => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-3 font-medium">${e.id}</td>
+                    <td class="px-6 py-3">${e.dept}</td>
+                    <td class="px-6 py-3">${e.level}</td>
+                    <td class="px-6 py-3">${formatMoney(e.salary)}</td>
+                    <td class="px-6 py-3 text-slate-400">${formatMoney(e.midpoint)}</td>
+                    <td class="px-6 py-3"><span class="${getCRColorClass(e.compa)}">${e.compa.toFixed(2)}</span></td>
+                    <td class="px-6 py-3 font-medium ${e.risk.includes('Critical') ? 'text-rose-600' : e.risk.includes('Resolved') ? 'text-emerald-500' : ''}">
+                        ${e.risk.includes('Critical') ? '<i class="fa-solid fa-triangle-exclamation mr-1"></i> ' : ''}${e.risk}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateBudgetSimulation() {
+            const pct = parseFloat(document.getElementById('budget-slider').value);
+            document.getElementById('budget-val-display').innerText = pct.toFixed(1) + '%';
+            
+            const simResult = simulateRaises(pct);
+            currentSimulatedEmployees = simResult.simulated;
+            
+            const pool = simResult.pool;
+            const costToMidpoint = simResult.totalDeficit; // Recalculated cost to midpoint based on baseline gaps
+            
+            document.getElementById('pool-display').innerText = formatMoney(pool);
+            document.getElementById('cost-display').innerText = formatMoney(costToMidpointBaseline);
+
+            // Update Dynamic Status Alert
+            const status = document.getElementById('budget-status');
+            const poolContainer = document.getElementById('pool-container');
+            const delta = pool - costToMidpointBaseline;
+            
+            if(pct === 0) {
+                status.className = "mt-4 p-3 rounded-lg text-center text-sm font-semibold bg-slate-100 text-slate-600 border border-slate-200";
+                status.innerHTML = "Awaiting budget allocation input.";
+                poolContainer.className = "p-4 rounded-xl bg-slate-50 border border-slate-100 flex justify-between items-center transition-all";
+            } else if (delta >= 0) {
+                status.className = "mt-4 p-3 rounded-lg text-center text-sm font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200";
+                status.innerHTML = `<i class="fa-solid fa-circle-check"></i> Surplus to market target: ${formatMoney(delta)}`;
+                poolContainer.className = "p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex justify-between items-center transition-all ring-2 ring-emerald-100";
+            } else {
+                status.className = "mt-4 p-3 rounded-lg text-center text-sm font-semibold bg-rose-50 text-rose-700 border border-rose-200";
+                status.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Deficit to fix gaps: ${formatMoney(Math.abs(delta))}`;
+                poolContainer.className = "p-4 rounded-xl bg-slate-50 border border-slate-100 flex justify-between items-center transition-all";
+            }
+
+            // Update Main KPI Cards Dynamically Based on Simulation!
+            let newPayroll = currentSimulatedEmployees.reduce((s, e) => s + e.salary, 0);
+            let newAvgCompa = currentSimulatedEmployees.reduce((s, e) => s + e.compa, 0) / currentSimulatedEmployees.length;
+            let newCriticalCount = currentSimulatedEmployees.filter(e => e.risk === 'Critical Risk').length;
+            let resolvedCount = currentSimulatedEmployees.filter(e => e.risk.includes('Resolved')).length;
+
+            document.getElementById('ret-kpi-payroll').innerText = '$' + (newPayroll / 1000000).toFixed(2) + 'M';
+            document.getElementById('ret-kpi-compa').innerText = newAvgCompa.toFixed(2);
+            document.getElementById('ret-kpi-risk').innerText = newCriticalCount;
+            
+            // Show dynamic diff indicators if budget > 0
+            const payDiff = document.getElementById('ret-kpi-payroll-diff');
+            const compaDiff = document.getElementById('ret-kpi-compa-diff');
+            const riskLabel = document.getElementById('ret-kpi-risk-label');
+            
+            if(pct > 0) {
+                payDiff.classList.remove('hidden');
+                payDiff.innerHTML = `<i class="fa-solid fa-arrow-trend-up"></i> +${formatMoney(newPayroll - totalPayrollBaseline)}`;
+                
+                compaDiff.classList.remove('hidden');
+                let compaDelta = newAvgCompa - (totalPayrollBaseline ? (employees.reduce((s,e)=>s+e.compa,0)/employees.length) : 0);
+                compaDiff.innerHTML = `<i class="fa-solid fa-arrow-up"></i> +${compaDelta.toFixed(2)}`;
+                
+                if(resolvedCount > 0) {
+                    document.getElementById('card-ret-risk').classList.add('border-emerald-200', 'bg-emerald-50/30');
+                    riskLabel.innerHTML = `<span class="text-emerald-600 font-medium"><i class="fa-solid fa-check"></i> ${resolvedCount} risks resolved</span>`;
+                }
+            } else {
+                payDiff.classList.add('hidden');
+                compaDiff.classList.add('hidden');
+                document.getElementById('card-ret-risk').classList.remove('border-emerald-200', 'bg-emerald-50/30');
+                riskLabel.innerText = "Underpaid High-Performers";
+            }
+
+            // Also re-render the box plot based on simulated compa-ratios
+            renderRetentionPlot();
+            renderRetentionTable();
+        }
+
+        document.getElementById('budget-slider').addEventListener('input', updateBudgetSimulation);
+
+        function renderRetentionPlot() {
+            const plotData = depts.map(d => {
+                return {
+                    y: currentSimulatedEmployees.filter(e => e.dept === d).map(e => e.compa),
+                    type: 'box', name: d, boxpoints: 'all', jitter: 0.3, pointpos: -1.8,
+                    marker: { size: 4, color: d === 'Engineering' ? '#1d58ff' : '#94a3b8' }
+                }
+            });
+            const layout = {
+                margin: { t: 10, b: 40, l: 40, r: 10 },
+                paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: false,
+                yaxis: { title: 'Compa-Ratio', gridcolor: '#f1f5f9' },
+                shapes: [{ type: 'line', x0: -0.5, x1: depts.length - 0.5, y0: 1.0, y1: 1.0, line: { color: '#10b981', dash: 'dash' } }]
+            };
+            Plotly.react('plot-retention-box', plotData, layout);
+        }
+
+        // --- STREAMING_CHUNK: TA Offers Logic & Filtering ---
+        
+        let currentTAFilter = 'All';
+
+        const taFilterOptions = [
+            { id: 'All', label: 'All Offers' },
+            { id: 'Declined', label: 'Declined Only' },
+            { id: 'Backend L4', label: 'Backend L4' },
+            { id: 'Critical', label: 'Critical (<0.85 CR)' }
+        ];
+
+        function setTAFilter(filterId) {
+            currentTAFilter = filterId;
+            renderTAFilters();
+            renderTAData();
+        }
+
+        function renderTAFilters() {
+            const container = document.getElementById('ta-filter-buttons');
+            container.innerHTML = taFilterOptions.map(f => `
+                <button onclick="setTAFilter('${f.id}')" 
+                    class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${currentTAFilter === f.id ? 'bg-brand-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">
+                    ${f.label}
+                </button>
+            `).join('');
+        }
+
+        function renderTAData() {
+            // Apply Filters to Dataset
+            let filteredOffers = offers;
+            if (currentTAFilter === 'Declined') filteredOffers = offers.filter(o => o.outcome === 'Declined');
+            if (currentTAFilter === 'Backend L4') filteredOffers = offers.filter(o => o.role === 'Backend Engineer' && o.level === 'L4');
+            if (currentTAFilter === 'Critical') filteredOffers = offers.filter(o => o.compa < 0.85);
+
+            // Update Table
+            const tbody = document.getElementById('ta-table-body');
+            tbody.innerHTML = filteredOffers.map(o => `
+                <tr class="transition-colors ${o.outcome === 'Declined' ? 'bg-rose-50/50 hover:bg-rose-50' : 'hover:bg-slate-50'}">
+                    <td class="px-6 py-3 font-medium">${o.role}</td>
+                    <td class="px-6 py-3">${o.level}</td>
+                    <td class="px-6 py-3"><span class="${o.compa < 0.95 ? 'text-rose-600 font-semibold' : 'text-slate-600'}">${o.compa.toFixed(2)}</span></td>
+                    <td class="px-6 py-3">${formatMoney(o.offered)}</td>
+                    <td class="px-6 py-3 font-medium ${o.outcome === 'Declined' ? 'text-rose-600' : 'text-emerald-600'}">
+                        ${o.outcome === 'Declined' ? '<i class="fa-solid fa-xmark mr-1"></i>' : '<i class="fa-solid fa-check mr-1"></i>'}${o.outcome}
+                    </td>
+                    <td class="px-6 py-3 text-slate-500">${o.competing_offer ? formatMoney(o.competing_offer) : '--'}</td>
+                </tr>
+            `).join('');
+
+            // Dynamic KPI Recalculation for the "Backend L4" specific KPI cards based on filter (if applicable, though usually they are fixed context. Let's make them dynamic based on the actual raw data to prove it works).
+            const be_l4 = filteredOffers.filter(o => o.role === 'Backend Engineer' && o.level === 'L4');
+            const be_l4_declines = be_l4.filter(o => o.compa < 0.95 && o.outcome === 'Declined');
+            const be_l4_total_under_95 = be_l4.filter(o => o.compa < 0.95);
+            
+            let currentLost = be_l4_declines.length;
+            let currentDeclineRate = be_l4_total_under_95.length ? (currentLost / be_l4_total_under_95.length * 100) : 0;
+            let currentGap = currentLost ? be_l4_declines.reduce((s, o) => s + (o.competing_offer - o.offered), 0) / currentLost : 0;
+
+            // If we filter out Backend L4 entirely (e.g., filtering just for a different role if we had one), handle graceful fallback. Since we only have Backend L4 and "Other" in our generator, we show context.
+            if(currentTAFilter !== 'All' && currentTAFilter !== 'Backend L4' && currentTAFilter !== 'Declined' && be_l4.length === 0) {
+                 document.getElementById('ta-kpi-decline').innerText = '--';
+                 document.getElementById('ta-kpi-lost').innerText = '--';
+                 document.getElementById('ta-kpi-gap').innerText = '--';
+                 document.getElementById('ta-kpi-title-decline').innerText = 'Decline Rate (N/A in filter)';
+                 document.getElementById('ta-kpi-title-lost').innerText = 'Lost Candidates (N/A)';
+            } else {
+                 document.getElementById('ta-kpi-decline').innerText = currentDeclineRate.toFixed(1) + '%';
+                 document.getElementById('ta-kpi-lost').innerText = currentLost;
+                 document.getElementById('ta-kpi-gap').innerText = currentGap > 0 ? formatMoney(currentGap) : '--';
+                 document.getElementById('ta-kpi-title-decline').innerText = 'Backend L4 Decline Rate (< 0.95 CR)';
+                 document.getElementById('ta-kpi-title-lost').innerText = 'Lost Candidates (Backend L4)';
+            }
+
+            // Visual Alert styling if decline rate is super high
+            const cardDecline = document.getElementById('ta-card-decline');
+            if(currentDeclineRate > 50) {
+                cardDecline.classList.add('bg-rose-50', 'border-rose-100');
+                cardDecline.classList.remove('bg-white', 'border-slate-100');
+            } else {
+                cardDecline.classList.remove('bg-rose-50', 'border-rose-100');
+                cardDecline.classList.add('bg-white', 'border-slate-100');
+            }
+
+            // Re-render Bar Chart with filtered data
+            const buckets = ["<0.85", "0.85-0.90", "0.90-0.95", "0.95-1.05", ">1.05"];
+            const acc = buckets.map(b => filteredOffers.filter(o => o.bucket === b && o.outcome === 'Accepted').length);
+            const dec = buckets.map(b => filteredOffers.filter(o => o.bucket === b && o.outcome === 'Declined').length);
+
+            const trace1 = { x: buckets, y: acc, name: 'Accepted', type: 'bar', marker: {color: '#10b981'} };
+            const trace2 = { x: buckets, y: dec, name: 'Declined', type: 'bar', marker: {color: '#f43f5e'} };
+
+            const layout = {
+                barmode: 'group',
+                margin: { t: 10, b: 40, l: 40, r: 10 },
+                paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+                yaxis: { title: 'Offer Count', gridcolor: '#f1f5f9' },
+                xaxis: { title: 'Offer Compa-Ratio Bracket' },
+                legend: { orientation: 'h', y: 1.1 }
+            };
+            Plotly.react('plot-ta-bar', [trace1, trace2], layout);
+        }
+
+        // --- STREAMING_CHUNK: Equity Audit Logic & Breakdown Table ---
+
+        function renderEquity() {
+            // Plotly Scatter
+            const plotData = genders.map(g => {
+                return {
+                    x: employees.filter(e => e.gender === g).map(e => e.salary),
+                    y: employees.filter(e => e.gender === g).map(e => e.compa),
+                    mode: 'markers',
+                    type: 'scatter',
+                    name: g,
+                    marker: { size: 8, opacity: 0.7, color: g === 'Female' ? '#1d58ff' : '#94a3b8' }
+                }
+            });
+            const layout = {
+                margin: { t: 10, b: 40, l: 40, r: 10 },
+                paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+                yaxis: { title: 'Compa-Ratio', gridcolor: '#f1f5f9' },
+                xaxis: { title: 'Annual Salary ($)', gridcolor: '#f1f5f9' },
+                legend: { orientation: 'h', y: 1.1 },
+                shapes: [{ type: 'line', x0: 50000, x1: 250000, y0: 1.0, y1: 1.0, line: { color: '#10b981', dash: 'dash' } }]
+            };
+            Plotly.react('plot-equity-scatter', plotData, layout, {displayModeBar: false});
+
+            // Generate Pay Equity Breakdown Table
+            const tbody = document.getElementById('equity-table-body');
+            
+            // Calculate baseline male averages per department
+            const maleBaselines = {};
+            depts.forEach(d => {
+                const males = employees.filter(e => e.dept === d && e.gender === 'Male');
+                maleBaselines[d] = males.length ? males.reduce((s, e) => s + e.compa, 0) / males.length : 1.0;
+            });
+
+            // Calculate stats for all cohorts
+            let tableHTML = '';
+            depts.forEach(d => {
+                genders.forEach(g => {
+                    const cohort = employees.filter(e => e.dept === d && e.gender === g);
+                    if(cohort.length === 0) return;
+                    
+                    const avgCR = cohort.reduce((s, e) => s + e.compa, 0) / cohort.length;
+                    
+                    // Gap vs Male in same dept
+                    let gapPct = 0;
+                    if (g !== 'Male' && maleBaselines[d]) {
+                        gapPct = Math.abs((avgCR - maleBaselines[d]) / maleBaselines[d]) * 100;
+                    }
+
+                    let gapColor = 'text-slate-400';
+                    let gapIcon = '';
+                    if(g !== 'Male') {
+                        if (gapPct <= 2.0) { gapColor = 'text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded'; gapIcon = '<i class="fa-solid fa-check text-xs"></i> '; }
+                        else if (gapPct <= 5.0) { gapColor = 'text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded'; gapIcon = '<i class="fa-solid fa-triangle-exclamation text-xs"></i> '; }
+                        else { gapColor = 'text-rose-600 font-semibold bg-rose-50 px-2 py-0.5 rounded'; gapIcon = '<i class="fa-solid fa-xmark text-xs"></i> '; }
+                    }
+
+                    tableHTML += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-5 py-3 font-medium text-slate-700">${d}</td>
+                            <td class="px-5 py-3">${g} <span class="text-xs text-slate-400 ml-1">(n=${cohort.length})</span></td>
+                            <td class="px-5 py-3">${avgCR.toFixed(3)}</td>
+                            <td class="px-5 py-3 text-right">
+                                ${g === 'Male' ? '<span class="text-slate-400 italic text-xs">Baseline</span>' : `<span class="${gapColor}">${gapIcon}${gapPct.toFixed(1)}%</span>`}
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+            tbody.innerHTML = tableHTML;
+        }
+
+        // --- STREAMING_CHUNK: CA Market Bridge Logic ---
+        
+        const canadaData = {
+            "Backend Engineer L4": { us: 145000, toronto: 168000, benefits: 8200 },
+            "Product Manager L5": { us: 175000, toronto: 198000, benefits: 9100 },
+            "Data Scientist L4": { us: 140000, toronto: 162000, benefits: 7800 },
+            "Field Operations Specialist L3": { us: 85000, toronto: 94000, benefits: 5400 },
+            "Finance Analyst L4": { us: 110000, toronto: 124000, benefits: 6600 }
+        };
+
+        function renderCanada() {
+            const role = document.getElementById('role-select').value;
+            const data = canadaData[role];
+            
+            const rawCad = Math.floor(data.us * 1.36);
+            const totalComp = data.toronto + data.benefits;
+            const gapPct = (((data.toronto - rawCad) / rawCad) * 100).toFixed(1);
+
+            document.getElementById('canada-kpi-us').innerText = formatMoney(data.us);
+            document.getElementById('canada-kpi-raw').innerText = formatMoney(rawCad);
+            document.getElementById('canada-kpi-market').innerText = formatMoney(data.toronto);
+            document.getElementById('canada-kpi-benefits').innerText = '+' + formatMoney(data.benefits);
+
+            const trace1 = { x: ['Raw CAD Conversion'], y: [rawCad], name: 'Raw CAD', type: 'bar', marker: {color: '#94a3b8'} };
+            const trace2 = { x: ['Toronto Market Rate'], y: [data.toronto], name: 'Toronto Market', type: 'bar', marker: {color: '#ef4444'} };
+            const trace3 = { x: ['Total Comp (w/ Benefits)'], y: [totalComp], name: 'Total Comp', type: 'bar', marker: {color: '#10b981'} };
+
+            const layout = {
+                barmode: 'group',
+                margin: { t: 10, b: 40, l: 60, r: 10 },
+                paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+                yaxis: { title: 'Compensation (CAD $)', gridcolor: '#f1f5f9' },
+                xaxis: { showticklabels: true },
+                showlegend: false
+            };
+            Plotly.react('plot-canada-bar', [trace1, trace2, trace3], layout);
+
+            // Update Dynamic AI Prompt
+            aiPrompts['canada'] = `<strong>MEMORANDUM: Toronto Market Compensation Strategy</strong><br><br>
+                       <strong>The Challenge:</strong> A direct USD-to-CAD conversion for ${role} produces a CAD ${formatMoney(rawCad)} offer. However, Toronto's tech market rate for this role sits at CAD ${formatMoney(data.toronto)} — a <strong>${gapPct}% premium</strong> above raw conversion.<br><br>
+                       <strong>Why the Gap Exists:</strong> Toronto's tech talent market benchmarks against companies like Shopify, Wealthsimple, and RBC rather than US Southwest markets. Additionally, Canadian total compensation includes CPP and EI employer contributions worth approximately CAD ${formatMoney(data.benefits)} annually per employee — reducing effective base salary competitiveness when US packages are quoted directly.<br><br>
+                       <strong>Recommendation:</strong> All Toronto offers for ${role} should be modeled against the Toronto Market Rate of CAD ${formatMoney(data.toronto)} as the midpoint, not the USD equivalent. Initial offers should target 97-100% compa-ratio against this Canadian benchmark.`;
+        }
+
+        // --- STREAMING_CHUNK: View Switching & UI Logic ---
+        
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            document.getElementById(`nav-${viewId}`).classList.add('active');
+            document.getElementById('ai-panel').classList.add('hidden');
+
+            // Smooth scroll to top
+            document.getElementById('main-scroll-area').scrollTo({top: 0, behavior: 'smooth'});
+
+            if(viewId === 'retention') { renderRetentionPlot(); updateBudgetSimulation(); }
+            if(viewId === 'ta-offers') renderTAData();
+            if(viewId === 'equity') renderEquity();
+            if(viewId === 'canada') renderCanada();
+        }
+
+        function toggleSettings() {
+            const modal = document.getElementById('settings-modal');
+            const content = document.getElementById('modal-content');
+            if(modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => content.classList.replace('scale-95', 'scale-100'), 10);
+            } else {
+                content.classList.replace('scale-100', 'scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 200);
+            }
+        }
+
+        // --- STREAMING_CHUNK: AI Executive Synthesis (Simulation Mode) ---
+        const aiPrompts = {
+            'ta': `<strong>MEMORANDUM: Backend Engineering Offer Strategy</strong><br><br>
+                   <strong>The Problem:</strong> Our ATS integration data shows a critical market misalignment. Backend L4 offers extended below a 95% compa-ratio are currently experiencing a severe <strong>67.4% rejection rate</strong>. <br><br>
+                   <strong>Financial Impact:</strong> We have lost fully vetted technical candidates in this specific bracket this quarter. Post-decline analysis indicates competing offers are beating our initial packages by an average of <strong>$9,000+</strong>.<br><br>
+                   <strong>Actionable Recommendation:</strong> To halt pipeline leakage, implement an immediate policy requiring all Backend L4 initial offers to be modeled at a <strong>minimum 98% compa-ratio</strong>. Increasing the initial offer out-of-pocket is mathematically and operationally cheaper than restarting a 45-day recruiting cycle for these critical roles.`,
+            
+            'equity': `<strong>MEMORANDUM: Q3 Pay Equity Audit</strong><br><br>
+                       <strong>Overview:</strong> We conducted a comprehensive demographic audit of the N=250 workforce payload. The raw (unadjusted) data indicates a Female-to-Male pay ratio of 92.4¢.<br><br>
+                       <strong>Adjusted Analysis:</strong> When controlling for strictly comparable variables—specifically isolating employees in the identical Department and Job Level—the adjusted pay gap closes to <strong>99.1¢</strong>, demonstrating strong systemic equity.<br><br>
+                       <strong>Next Steps:</strong> The remaining 0.9¢ variance is statistically immaterial and largely driven by tenure-in-role. However, HR Business Partners should proactively review the specific individuals flagged in the lower quartile to ensure no unintentional bias exists in the upcoming promotion cycle.`,
+            
+            'canada': '' // Populated dynamically in renderCanada()
+        };
+
+        function generateAI(type) {
+            const panel = document.getElementById('ai-panel');
+            const content = document.getElementById('ai-content');
+            panel.classList.remove('hidden');
+            
+            setTimeout(() => {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 100);
+
+            content.innerHTML = '<span class="text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Claude 4.6 is synthesizing data payload...</span>';
+            
+            setTimeout(() => {
+                const text = aiPrompts[type];
+                content.innerHTML = '';
+                
+                let i = 0;
+                let isTag = false;
+                let currentText = '';
+                
+                function typeWriter() {
+                    if (i < text.length) {
+                        if (text.charAt(i) === '<') isTag = true;
+                        currentText += text.charAt(i);
+                        if (text.charAt(i) === '>') isTag = false;
+                        
+                        if(!isTag) {
+                            content.innerHTML = currentText + '<span class="typewriter-cursor"></span>';
+                        }
+                        i++;
+                        setTimeout(typeWriter, isTag ? 0 : 10);
+                    } else {
+                        content.innerHTML = currentText; 
+                    }
+                }
+                typeWriter();
+            }, 800);
+        }
+
+        // Initialize default views
+        setTAFilter('All');
+        renderCanada();
+        
+        // Handle window resize for charts
+        window.addEventListener('resize', () => {
+            const activeView = document.querySelector('.view-section.active').id;
+            if(activeView === 'view-retention') renderRetentionPlot();
+            if(activeView === 'view-ta-offers') renderTAData();
+            if(activeView === 'view-equity') renderEquity();
+            if(activeView === 'view-canada') renderCanada();
+        });
+    </script>
+</body>
+</html>
