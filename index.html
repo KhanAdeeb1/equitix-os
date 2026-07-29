@@ -169,7 +169,7 @@
                     <div class="bg-rose-50 rounded-2xl p-5 shadow-soft border border-rose-100 relative overflow-hidden transition-all duration-300" id="ta-card-decline">
                         <div class="absolute right-0 top-0 w-16 h-16 bg-rose-100 rounded-bl-full -z-0"></div>
                         <p class="text-sm font-semibold text-rose-700 mb-2 relative z-10" id="ta-kpi-title-decline">Backend L4 Decline Rate (< 0.95 CR)</p>
-                        <h3 class="text-3xl font-bold text-rose-900 relative z-10" id="ta-kpi-decline">67.4%</h3>
+                        <h3 class="text-3xl font-bold text-rose-900 relative z-10" id="ta-kpi-decline">--</h3>
                         <p class="text-xs text-rose-600 mt-2 relative z-10"><i class="fa-solid fa-arrow-trend-up"></i> Critical Inflection Point</p>
                     </div>
                     <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 transition-all duration-300">
@@ -187,7 +187,7 @@
                 <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 mb-8 relative" title="Compa-Ratio = Your Salary ÷ Market Midpoint. 1.0 = exactly at market.">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-semibold text-slate-800">Acceptance vs. Decline Rates by Offer Compa-Ratio Bracket</h2>
-                        <span class="text-xs text-slate-400"><i class="fa-regular fa-circle-question"></i> Hover for Compa-Ratio Info</span>
+                        <span class="text-xs text-slate-400 cursor-help"><i class="fa-regular fa-circle-question"></i> Hover for Compa-Ratio Info</span>
                     </div>
                     <div id="plot-ta-bar" class="w-full min-h-[350px]"></div>
                 </div>
@@ -260,12 +260,16 @@
                             <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-arrow-trend-down"></i></div>
                         </div>
                         <h3 class="text-2xl font-bold text-slate-800" id="ret-kpi-overpay">--</h3>
+                        <p class="text-xs text-slate-400 mt-2">Compa-Ratio > 1.15</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <div class="lg:col-span-2 bg-white rounded-2xl shadow-soft border border-slate-100 p-6 relative" title="Compa-Ratio = Your Salary ÷ Market Midpoint. 1.0 = exactly at market.">
-                        <h2 class="text-lg font-semibold text-slate-800 mb-4">Compa-Ratio Distribution by Department</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-slate-800">Compa-Ratio Distribution by Department</h2>
+                            <span class="text-xs text-slate-400 cursor-help"><i class="fa-regular fa-circle-question"></i> Hover for Info</span>
+                        </div>
                         <div id="plot-retention-box" class="w-full min-h-[300px]"></div>
                     </div>
 
@@ -346,7 +350,7 @@
                     <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-slate-500 mb-1">Unadjusted Pay Gap (Female to Male)</p>
-                            <h3 class="text-2xl font-bold text-slate-800">92.4¢</h3>
+                            <h3 class="text-2xl font-bold text-slate-800" id="equity-kpi-unadjusted">--</h3>
                             <p class="text-xs text-slate-400 mt-1">Raw average comparison across all roles</p>
                         </div>
                         <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center text-xl"><i class="fa-solid fa-scale-unbalanced"></i></div>
@@ -354,7 +358,7 @@
                     <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-slate-500 mb-1">Adjusted Pay Gap (Same Role/Level)</p>
-                            <h3 class="text-2xl font-bold text-brand-600">99.1¢</h3>
+                            <h3 class="text-2xl font-bold text-brand-600" id="equity-kpi-adjusted">--</h3>
                             <p class="text-xs text-slate-400 mt-1">Statistically normalized compliance metric</p>
                         </div>
                         <div class="w-12 h-12 rounded-full bg-brand-50 text-brand-500 flex items-center justify-center text-xl"><i class="fa-solid fa-scale-balanced"></i></div>
@@ -363,7 +367,10 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                     <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 relative" title="Compa-Ratio = Your Salary ÷ Market Midpoint. 1.0 = exactly at market.">
-                        <h2 class="text-lg font-semibold text-slate-800 mb-4">Compa-Ratio Distribution by Gender</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-slate-800">Compa-Ratio Distribution by Gender</h2>
+                            <span class="text-xs text-slate-400 cursor-help"><i class="fa-regular fa-circle-question"></i> Hover for Info</span>
+                        </div>
                         <div id="plot-equity-scatter" class="w-full min-h-[350px]"></div>
                     </div>
                     
@@ -438,7 +445,10 @@
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 mb-8 relative" title="Comparing Raw Conversion to Actual Local Market Value">
-                    <h2 class="text-lg font-semibold text-slate-800 mb-4">Why Raw FX Conversion Underprices Toronto Talent</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-slate-800">Why Raw FX Conversion Underprices Toronto Talent</h2>
+                        <span class="text-xs text-slate-400 cursor-help"><i class="fa-regular fa-circle-question"></i> Hover for Detail</span>
+                    </div>
                     <div id="plot-canada-bar" class="w-full min-h-[350px]"></div>
                 </div>
             </div>
@@ -508,7 +518,7 @@
         
         const depts = ['Engineering', 'Product', 'Field Ops', 'Sales', 'Finance'];
         const levels = ['L3', 'L4', 'L5', 'L6'];
-        const genders = ['Male', 'Female']; // Simplified for gap math visualization
+        const genders = ['Male', 'Female']; 
         
         const employees = [];
         let totalPayrollBaseline = 0;
@@ -593,6 +603,13 @@
             offers.push({ role, level, compa, bucket, outcome, offered, competing_offer });
         }
 
+        // Initialize Dynamic AI Prompts object
+        const aiPrompts = {
+            'ta': '',
+            'equity': '',
+            'canada': ''
+        };
+
         // --- STREAMING_CHUNK: Retention & Merit Simulation Logic ---
         
         let currentSimulatedEmployees = [...employees];
@@ -612,13 +629,11 @@
             let totalDeficit = underpaid.reduce((sum, e) => sum + (e.midpoint - e.salary), 0);
 
             if (pool > 0 && totalDeficit > 0) {
-                // If pool exists, distribute proportionally to those under midpoint
                 let allocationRatio = Math.min(pool / totalDeficit, 1.0);
                 underpaid.forEach(e => {
                     let raise = (e.midpoint - e.salary) * allocationRatio;
                     e.salary += raise;
                     e.compa = e.salary / e.midpoint;
-                    // Dynamically recalculate risk based on simulated compa
                     if (e.compa >= 0.90 && e.risk === 'Critical Risk') e.risk = 'Balanced (Resolved)';
                 });
             }
@@ -627,12 +642,13 @@
 
         function renderRetentionTable() {
             const tbody = document.getElementById('retention-table-body');
+            currentDeptFilter = document.getElementById('retention-dept-filter').value;
             let filtered = currentSimulatedEmployees;
+            
             if (currentDeptFilter !== 'All') {
                 filtered = filtered.filter(e => e.dept === currentDeptFilter);
             }
             
-            // Sort to show Critical Risks and lowest Compa first
             filtered.sort((a, b) => {
                 if (a.risk.includes('Critical') && !b.risk.includes('Critical')) return -1;
                 if (!a.risk.includes('Critical') && b.risk.includes('Critical')) return 1;
@@ -647,7 +663,7 @@
                     <td class="px-6 py-3">${formatMoney(e.salary)}</td>
                     <td class="px-6 py-3 text-slate-400">${formatMoney(e.midpoint)}</td>
                     <td class="px-6 py-3"><span class="${getCRColorClass(e.compa)}">${e.compa.toFixed(2)}</span></td>
-                    <td class="px-6 py-3 font-medium ${e.risk.includes('Critical') ? 'text-rose-600' : e.risk.includes('Resolved') ? 'text-emerald-500' : ''}">
+                    <td class="px-6 py-3 font-medium ${e.risk.includes('Critical') ? 'text-rose-600' : e.risk.includes('Resolved') ? 'text-emerald-500' : e.risk.includes('Overpaid') ? 'text-amber-500' : ''}">
                         ${e.risk.includes('Critical') ? '<i class="fa-solid fa-triangle-exclamation mr-1"></i> ' : ''}${e.risk}
                     </td>
                 </tr>
@@ -662,7 +678,7 @@
             currentSimulatedEmployees = simResult.simulated;
             
             const pool = simResult.pool;
-            const costToMidpoint = simResult.totalDeficit; // Recalculated cost to midpoint based on baseline gaps
+            const costToMidpoint = simResult.totalDeficit; 
             
             document.getElementById('pool-display').innerText = formatMoney(pool);
             document.getElementById('cost-display').innerText = formatMoney(costToMidpointBaseline);
@@ -686,15 +702,17 @@
                 poolContainer.className = "p-4 rounded-xl bg-slate-50 border border-slate-100 flex justify-between items-center transition-all";
             }
 
-            // Update Main KPI Cards Dynamically Based on Simulation!
+            // Update Main KPI Cards Dynamically
             let newPayroll = currentSimulatedEmployees.reduce((s, e) => s + e.salary, 0);
             let newAvgCompa = currentSimulatedEmployees.reduce((s, e) => s + e.compa, 0) / currentSimulatedEmployees.length;
             let newCriticalCount = currentSimulatedEmployees.filter(e => e.risk === 'Critical Risk').length;
             let resolvedCount = currentSimulatedEmployees.filter(e => e.risk.includes('Resolved')).length;
+            let newOverpayCount = currentSimulatedEmployees.filter(e => e.risk.includes('Overpaid')).length;
 
             document.getElementById('ret-kpi-payroll').innerText = '$' + (newPayroll / 1000000).toFixed(2) + 'M';
             document.getElementById('ret-kpi-compa').innerText = newAvgCompa.toFixed(2);
             document.getElementById('ret-kpi-risk').innerText = newCriticalCount;
+            document.getElementById('ret-kpi-overpay').innerText = newOverpayCount;
             
             // Show dynamic diff indicators if budget > 0
             const payDiff = document.getElementById('ret-kpi-payroll-diff');
@@ -720,7 +738,6 @@
                 riskLabel.innerText = "Underpaid High-Performers";
             }
 
-            // Also re-render the box plot based on simulated compa-ratios
             renderRetentionPlot();
             renderRetentionTable();
         }
@@ -773,13 +790,11 @@
         }
 
         function renderTAData() {
-            // Apply Filters to Dataset
             let filteredOffers = offers;
             if (currentTAFilter === 'Declined') filteredOffers = offers.filter(o => o.outcome === 'Declined');
             if (currentTAFilter === 'Backend L4') filteredOffers = offers.filter(o => o.role === 'Backend Engineer' && o.level === 'L4');
             if (currentTAFilter === 'Critical') filteredOffers = offers.filter(o => o.compa < 0.85);
 
-            // Update Table
             const tbody = document.getElementById('ta-table-body');
             tbody.innerHTML = filteredOffers.map(o => `
                 <tr class="transition-colors ${o.outcome === 'Declined' ? 'bg-rose-50/50 hover:bg-rose-50' : 'hover:bg-slate-50'}">
@@ -794,7 +809,7 @@
                 </tr>
             `).join('');
 
-            // Dynamic KPI Recalculation for the "Backend L4" specific KPI cards based on filter (if applicable, though usually they are fixed context. Let's make them dynamic based on the actual raw data to prove it works).
+            // Dynamic KPI Calculation
             const be_l4 = filteredOffers.filter(o => o.role === 'Backend Engineer' && o.level === 'L4');
             const be_l4_declines = be_l4.filter(o => o.compa < 0.95 && o.outcome === 'Declined');
             const be_l4_total_under_95 = be_l4.filter(o => o.compa < 0.95);
@@ -803,7 +818,6 @@
             let currentDeclineRate = be_l4_total_under_95.length ? (currentLost / be_l4_total_under_95.length * 100) : 0;
             let currentGap = currentLost ? be_l4_declines.reduce((s, o) => s + (o.competing_offer - o.offered), 0) / currentLost : 0;
 
-            // If we filter out Backend L4 entirely (e.g., filtering just for a different role if we had one), handle graceful fallback. Since we only have Backend L4 and "Other" in our generator, we show context.
             if(currentTAFilter !== 'All' && currentTAFilter !== 'Backend L4' && currentTAFilter !== 'Declined' && be_l4.length === 0) {
                  document.getElementById('ta-kpi-decline').innerText = '--';
                  document.getElementById('ta-kpi-lost').innerText = '--';
@@ -818,7 +832,6 @@
                  document.getElementById('ta-kpi-title-lost').innerText = 'Lost Candidates (Backend L4)';
             }
 
-            // Visual Alert styling if decline rate is super high
             const cardDecline = document.getElementById('ta-card-decline');
             if(currentDeclineRate > 50) {
                 cardDecline.classList.add('bg-rose-50', 'border-rose-100');
@@ -828,7 +841,13 @@
                 cardDecline.classList.add('bg-white', 'border-slate-100');
             }
 
-            // Re-render Bar Chart with filtered data
+            // Update Dynamic AI Prompt
+            aiPrompts['ta'] = `<strong>MEMORANDUM: Backend Engineering Offer Strategy</strong><br><br>
+                   <strong>The Problem:</strong> Our ATS integration data shows a critical market misalignment. Backend L4 offers extended below a 95% compa-ratio are currently experiencing a severe <strong>${currentDeclineRate.toFixed(1)}% rejection rate</strong>. <br><br>
+                   <strong>Financial Impact:</strong> We have lost ${currentLost} fully vetted technical candidates in this specific bracket this quarter. Post-decline analysis indicates competing offers are beating our initial packages by an average of <strong>${formatMoney(currentGap)}</strong>.<br><br>
+                   <strong>Actionable Recommendation:</strong> To halt pipeline leakage, implement an immediate policy requiring all Backend L4 initial offers to be modeled at a <strong>minimum 98% compa-ratio</strong>. Increasing the initial offer out-of-pocket is mathematically and operationally cheaper than restarting a 45-day recruiting cycle for these critical roles.`;
+
+            // Render Chart
             const buckets = ["<0.85", "0.85-0.90", "0.90-0.95", "0.95-1.05", ">1.05"];
             const acc = buckets.map(b => filteredOffers.filter(o => o.bucket === b && o.outcome === 'Accepted').length);
             const dec = buckets.map(b => filteredOffers.filter(o => o.bucket === b && o.outcome === 'Declined').length);
@@ -850,6 +869,38 @@
         // --- STREAMING_CHUNK: Equity Audit Logic & Breakdown Table ---
 
         function renderEquity() {
+            // Calculate Dynamic KPIs based on JS Simulation Array
+            const femaleAvg = employees.filter(e => e.gender === 'Female').reduce((s, e) => s + e.compa, 0) / employees.filter(e => e.gender === 'Female').length;
+            const maleAvg = employees.filter(e => e.gender === 'Male').reduce((s, e) => s + e.compa, 0) / employees.filter(e => e.gender === 'Male').length;
+            const unadjustedGap = (femaleAvg / maleAvg) * 100;
+
+            let cohortGaps = [];
+            const maleBaselines = {};
+            depts.forEach(d => {
+                const males = employees.filter(e => e.dept === d && e.gender === 'Male');
+                maleBaselines[d] = males.length ? males.reduce((s, e) => s + e.compa, 0) / males.length : 1.0;
+                
+                levels.forEach(l => {
+                    let m = employees.filter(e => e.dept === d && e.level === l && e.gender === 'Male');
+                    let f = employees.filter(e => e.dept === d && e.level === l && e.gender === 'Female');
+                    if (m.length > 0 && f.length > 0) {
+                        let mAvg = m.reduce((s, e) => s + e.compa, 0) / m.length;
+                        let fAvg = f.reduce((s, e) => s + e.compa, 0) / f.length;
+                        cohortGaps.push((fAvg / mAvg) * 100);
+                    }
+                });
+            });
+            const adjustedGap = cohortGaps.length ? cohortGaps.reduce((s, v) => s + v, 0) / cohortGaps.length : unadjustedGap;
+
+            document.getElementById('equity-kpi-unadjusted').innerText = unadjustedGap.toFixed(1) + '¢';
+            document.getElementById('equity-kpi-adjusted').innerText = adjustedGap.toFixed(1) + '¢';
+
+            // Update Dynamic AI Prompt
+            aiPrompts['equity'] = `<strong>MEMORANDUM: Q3 Pay Equity Audit</strong><br><br>
+                       <strong>Overview:</strong> We conducted a comprehensive demographic audit of the N=250 workforce payload. The raw (unadjusted) data indicates a Female-to-Male pay ratio of ${unadjustedGap.toFixed(1)}¢.<br><br>
+                       <strong>Adjusted Analysis:</strong> When controlling for strictly comparable variables—specifically isolating employees in the identical Department and Job Level—the adjusted pay gap closes to <strong>${adjustedGap.toFixed(1)}¢</strong>, demonstrating strong systemic equity.<br><br>
+                       <strong>Next Steps:</strong> The remaining variance is statistically immaterial and largely driven by tenure-in-role. However, HR Business Partners should proactively review the specific individuals flagged in the lower quartile to ensure no unintentional bias exists in the upcoming promotion cycle.`;
+
             // Plotly Scatter
             const plotData = genders.map(g => {
                 return {
@@ -873,15 +924,6 @@
 
             // Generate Pay Equity Breakdown Table
             const tbody = document.getElementById('equity-table-body');
-            
-            // Calculate baseline male averages per department
-            const maleBaselines = {};
-            depts.forEach(d => {
-                const males = employees.filter(e => e.dept === d && e.gender === 'Male');
-                maleBaselines[d] = males.length ? males.reduce((s, e) => s + e.compa, 0) / males.length : 1.0;
-            });
-
-            // Calculate stats for all cohorts
             let tableHTML = '';
             depts.forEach(d => {
                 genders.forEach(g => {
@@ -890,7 +932,6 @@
                     
                     const avgCR = cohort.reduce((s, e) => s + e.compa, 0) / cohort.length;
                     
-                    // Gap vs Male in same dept
                     let gapPct = 0;
                     if (g !== 'Male' && maleBaselines[d]) {
                         gapPct = Math.abs((avgCR - maleBaselines[d]) / maleBaselines[d]) * 100;
@@ -960,7 +1001,7 @@
             aiPrompts['canada'] = `<strong>MEMORANDUM: Toronto Market Compensation Strategy</strong><br><br>
                        <strong>The Challenge:</strong> A direct USD-to-CAD conversion for ${role} produces a CAD ${formatMoney(rawCad)} offer. However, Toronto's tech market rate for this role sits at CAD ${formatMoney(data.toronto)} — a <strong>${gapPct}% premium</strong> above raw conversion.<br><br>
                        <strong>Why the Gap Exists:</strong> Toronto's tech talent market benchmarks against companies like Shopify, Wealthsimple, and RBC rather than US Southwest markets. Additionally, Canadian total compensation includes CPP and EI employer contributions worth approximately CAD ${formatMoney(data.benefits)} annually per employee — reducing effective base salary competitiveness when US packages are quoted directly.<br><br>
-                       <strong>Recommendation:</strong> All Toronto offers for ${role} should be modeled against the Toronto Market Rate of CAD ${formatMoney(data.toronto)} as the midpoint, not the USD equivalent. Initial offers should target 97-100% compa-ratio against this Canadian benchmark.`;
+                       <strong>Recommendation:</strong> All Toronto offers for ${role} should be modeled against the Toronto Market Rate of CAD ${formatMoney(data.toronto)} as the midpoint, not the USD equivalent. Initial offers staff should target 97-100% compa-ratio against this Canadian benchmark.`;
         }
 
         // --- STREAMING_CHUNK: View Switching & UI Logic ---
@@ -973,7 +1014,6 @@
             document.getElementById(`nav-${viewId}`).classList.add('active');
             document.getElementById('ai-panel').classList.add('hidden');
 
-            // Smooth scroll to top
             document.getElementById('main-scroll-area').scrollTo({top: 0, behavior: 'smooth'});
 
             if(viewId === 'retention') { renderRetentionPlot(); updateBudgetSimulation(); }
@@ -995,20 +1035,6 @@
         }
 
         // --- STREAMING_CHUNK: AI Executive Synthesis (Simulation Mode) ---
-        const aiPrompts = {
-            'ta': `<strong>MEMORANDUM: Backend Engineering Offer Strategy</strong><br><br>
-                   <strong>The Problem:</strong> Our ATS integration data shows a critical market misalignment. Backend L4 offers extended below a 95% compa-ratio are currently experiencing a severe <strong>67.4% rejection rate</strong>. <br><br>
-                   <strong>Financial Impact:</strong> We have lost fully vetted technical candidates in this specific bracket this quarter. Post-decline analysis indicates competing offers are beating our initial packages by an average of <strong>$9,000+</strong>.<br><br>
-                   <strong>Actionable Recommendation:</strong> To halt pipeline leakage, implement an immediate policy requiring all Backend L4 initial offers to be modeled at a <strong>minimum 98% compa-ratio</strong>. Increasing the initial offer out-of-pocket is mathematically and operationally cheaper than restarting a 45-day recruiting cycle for these critical roles.`,
-            
-            'equity': `<strong>MEMORANDUM: Q3 Pay Equity Audit</strong><br><br>
-                       <strong>Overview:</strong> We conducted a comprehensive demographic audit of the N=250 workforce payload. The raw (unadjusted) data indicates a Female-to-Male pay ratio of 92.4¢.<br><br>
-                       <strong>Adjusted Analysis:</strong> When controlling for strictly comparable variables—specifically isolating employees in the identical Department and Job Level—the adjusted pay gap closes to <strong>99.1¢</strong>, demonstrating strong systemic equity.<br><br>
-                       <strong>Next Steps:</strong> The remaining 0.9¢ variance is statistically immaterial and largely driven by tenure-in-role. However, HR Business Partners should proactively review the specific individuals flagged in the lower quartile to ensure no unintentional bias exists in the upcoming promotion cycle.`,
-            
-            'canada': '' // Populated dynamically in renderCanada()
-        };
-
         function generateAI(type) {
             const panel = document.getElementById('ai-panel');
             const content = document.getElementById('ai-content');
@@ -1050,6 +1076,7 @@
         // Initialize default views
         setTAFilter('All');
         renderCanada();
+        updateBudgetSimulation(); // Ensure initial render populates Overpay KPI correctly
         
         // Handle window resize for charts
         window.addEventListener('resize', () => {
